@@ -1,19 +1,11 @@
-<?js
-var data = obj || {};
-if (data.description) {
-?>
-<div class="param-desc">
-    <?js= description ?>
-</div>
-<?js } ?>
-
-<?js if (data.type && data.type.names) {?>
-<dl class="param-type">
-    <dt>
-        Type:&nbsp;
-    </dt>
-    <dd>
-        <?js= this.partial('type.tmpl', data.type.names) ?>
-    </dd>
-</dl>
+<?js if (obj?.total > 1) { ?>
+  <?js if (obj.index == 0) { ?><table><?js } ?>
+  <tr>
+    <td><?js= this.partial('type.tmpl', obj?.type.names) ?></td>
+    <td><?js= (obj?.description ?? '').replace(/^<p>(.+)<\/p>$/s, '$1') ?></td>
+  </tr>
+  <?js if (obj.index == obj.total - 1) { ?></table><?js } ?>
+<?js } else if (obj?.type?.names) { ?>
+  <?js= this.partial('type.tmpl', obj.type.names) ?>
+  <?js= obj?.description ?? '' ?>
 <?js } ?>

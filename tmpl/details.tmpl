@@ -12,13 +12,13 @@ var detailsKeys = [
     'since',
     'version',
 ]
-var hasToPrintDetails = (data.meta && self.outputSourceFiles) || 
-                        (data.author && author.length) || 
+var hasToPrintDetails = (data.meta && self.outputSourceFiles) ||
+                        (data.author && author.length) ||
                         (data.mixes && data.mixes.length) ||
                         (data.inherited && data.inherits && !data.overrides) ||
                         (data.implementations && data.implementations.length) ||
                         (data.implements && data.implements.length) ||
-                        (data.tutorials && tutorials.length) || 
+                        (data.tutorials && tutorials.length) ||
                         (data.see && see.length) ||
                         (data.todo && todo.length)
 

@@ -42,21 +42,12 @@ var self = this;
     </div>
 <?js } ?>
 
-<?js if (data['this']) { ?>
-    <div class="method-member-container mt-20">
-    <strong>This:</strong>
-    <ul><li><?js= this.linkto(data['this'], data['this']) ?></li></ul>
-    </div>
-<?js } ?>
-
 <?js if (data.params && params.length && !data.hideconstructor) { ?>
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
         <strong>Parameters:</strong>
         <?js= this.partial('params.tmpl', params) ?>
     </div>
 <?js } ?>
-
-<?js= this.partial('details.tmpl', data) ?>
 
 <?js if (data.kind !== 'module' && data.requires && data.requires.length) { ?>
     <div class="method-member-container flex flex-col w-100 overflow-auto mt-20">
@@ -118,35 +109,27 @@ var self = this;
     </div>
 <?js } ?>
 
+<?js if (data['this']) { ?>
+    <div class="method-member-container mt-20">
+    	<strong>Context:</strong>
+    	<code>this</code>&#8239;&rarr;&#8239;<span class="type-signature"><?js= this.linkto(data['this'], data['this']) ?></span>
+    </div>
+<?js } ?>
 
 <?js if (data.exceptions && exceptions.length) { ?>
     <div class="method-member-container mt-20">
-    <strong>Throws:</strong>
-    <?js if (exceptions.length > 1) { ?>
-        <ul>
-            <?js exceptions.forEach(function(r) { ?>
-                <li><?js= self.partial('exceptions.tmpl', r) ?></li>
-            <?js }); ?>
-        </ul>
-    <?js } else { exceptions.forEach(function(r) { ?>
-        <?js= self.partial('exceptions.tmpl', r) ?>
-    <?js });} ?>
-    </div>
+        <strong>Throws:</strong>
+        <?js exceptions.forEach(function(r, index) { ?>
+            <?js= self.partial('exceptions.tmpl', { ...r, index, total: exceptions.length }) ?>
+        <?js }); ?>
 <?js } ?>
 
 <?js if (data.returns && returns.length) { ?>
     <div class="method-member-container mt-20">
-    <strong>Returns:</strong>
-        <?js if (returns.length > 1) { ?>
-            <ul>
-                <?js returns.forEach(function(r) { ?>
-                    <li><?js= self.partial('returns.tmpl', r) ?></li>
-                <?js }); ?>
-            </ul>
-
-        <?js } else { returns.forEach(function(r) { ?>
-            <?js= self.partial('returns.tmpl', r) ?>
-            <?js });} ?>
+        <strong>Returns:</strong>
+        <?js returns.forEach(function(r, index) { ?>
+            <?js= self.partial('returns.tmpl', { ...r, index, total: returns.length }) ?>
+        <?js }); ?>
     </div>
 <?js } ?>
 
@@ -173,3 +156,5 @@ var self = this;
         <?js= this.partial('examples.tmpl', examples) ?>
     </div>
 <?js } ?>
+
+<?js= this.partial('details.tmpl', data) ?>

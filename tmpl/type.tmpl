@@ -1,13 +1,9 @@
-<?js
+<span class="type-signature"><?js
     var data = obj;
     var self = this;
-    data.forEach(function(name, i) { ?>
-        <?js 
-            var text = self.htmlsafe(name)
-            text = text.replace(/\|/g,'|<wbr>')
-            text = text.replace(/\./g,'.<wbr>')
-            var linkto = self.linkto(name, text) 
-        ?>
-        <span class="param-type"><?js= linkto ?></span>
-        <?js if (i < data.length-1) { ?>|<wbr><?js } ?>
-    <?js }); ?>
+    data.forEach(function(name, i) {
+        var linkto = self.fixupTypeName(self.linkto(name, self.htmlsafe(name)));
+        var sep = (i < data.length-1) ? '&#8239;|&#8239;<wbr>' : '';
+?><?js= linkto + sep ?><?js
+    });
+?></span>

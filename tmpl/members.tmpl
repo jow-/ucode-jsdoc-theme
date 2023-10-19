@@ -3,7 +3,7 @@ var data = obj;
 var self = this;
 ?>
 <h3 class="name has-anchor" id="<?js= id ?>">
-    <?js= data.attribs + name + (data.signature ? data.signature : '') ?>
+    <?js= name + data.attribs + (data.signature ? data.signature : '') ?>
 </h3>
 
 <?js if (data.summary) { ?>
@@ -19,11 +19,7 @@ var self = this;
 <?js if (data.type && data.type.names) {?>
     <div class="member-item-container flex">
         <strong>Type: </strong>
-        <ul>
-            <li>
-                <?js= self.partial('type.tmpl', data.type.names) ?>
-            </li>
-        </ul>
+        <?js= this.partial('type.tmpl', data.type.names) ?>
     </div>
 <?js } ?>
 

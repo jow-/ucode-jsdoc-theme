@@ -91,15 +91,11 @@
     <div class="sidebar-container">
       <?js= this.partial('sidebar.tmpl') ?>
     </div>
-    
+
     <div class="navbar-container" id="VuAckcnZhf">
       <?js= this.partial('navbar.tmpl') ?>
     </div>
 
-    <div class="toc-container">
-      <?js= this.partial('toc.tmpl') ?>
-    </div>
-    
     <div class="body-wrapper">
       <div class="main-content">
         <div class="main-wrapper">
@@ -113,7 +109,7 @@
             </div>
           </footer>
           <?js } ?>
-        
+
         </div>
       </div>
 
@@ -141,13 +137,17 @@
 
     <script type="text/javascript">
       var tocbotInstance = tocbot.init({
-        tocSelector: '#eed4d2a0bfd64539bb9df78095dec881',
+        tocSelector: '#mobile-tocbar > .mobile-sidebar-wrapper > .toc-contents',
         contentSelector: '.main-content',
         headingSelector: 'h1, h2, h3',
         hasInnerContainers: true,
         scrollContainer: '.main-content',
         headingsOffset: 130,
-        onClick: bringLinkToView
+        onClick: (...args) => {
+          hideMobileMenu();
+          bringLinkToView(...args);
+        },
+        includeHtml: true
       });
 
     </script>

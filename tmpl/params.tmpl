@@ -64,17 +64,17 @@
         <th>Name</th>
         <?js } ?>
 
-        <th>Type</th>
+        <th class="type">Type</th>
 
         <?js if (params.hasAttributes) {?>
-        <th>Attributes</th>
+        <th class="attributes">Attributes</th>
         <?js } ?>
 
         <?js if (params.hasDefault) {?>
-        <th>Default</th>
+        <th class="default">Default</th>
         <?js } ?>
 
-        <th class="last">Description</th>
+        <th class="description last">Description</th>
     </tr>
     </thead>
 
@@ -97,19 +97,13 @@
             </td>
 
             <?js if (params.hasAttributes) {?>
-                <td class="attributes">
-                <?js if (param.optional) { ?>
-                    &lt;optional><br>
-                <?js } ?>
-
-                <?js if (param.nullable) { ?>
-                    &lt;nullable><br>
-                <?js } ?>
-
-                <?js if (param.variable) { ?>
-                    &lt;repeatable><br>
-                <?js } ?>
-                </td>
+                <td class="attributes"><?js=
+                    [
+                        ...(param.optional ? ['optional'] : []),
+                        ...(param.nullable ? ['nullable'] : []),
+                        ...(param.variable ? ['repeatable'] : [])
+                    ].join(', ')
+                ?></td>
             <?js } ?>
 
             <?js if (params.hasDefault) {?>
@@ -120,7 +114,15 @@
                 </td>
             <?js } ?>
 
-            <td class="description last"><?js= param.description ?><?js if (param.subparams) { ?>
+            <td class="description last"><?js=
+                [
+                    ...(param.optional ? ['optional'] : []),
+                    ...(param.nullable ? ['nullable'] : []),
+                    ...(param.variable ? ['repeatable'] : []),
+                    ...(typeof param.defaultvalue !== 'undefined'
+                        ? [`default: <code>${self.htmlsafe(param.defaultvalue)}</code>`] : [])
+                ].join(', ').replace(/^.+$/, '<span class="inline-attributes">($&)</span>')
+            ?><?js= param.description ?><?js if (param.subparams) { ?>
                 <h6>Properties</h6>
                 <?js= self.partial('params.tmpl', param.subparams) ?>
             <?js } ?></td>

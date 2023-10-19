@@ -96,10 +96,16 @@
     ?>
         <h2 id="classes" class="subsection-title has-anchor">Classes</h2>
 
-        <dl><?js classes.forEach(function(c) { ?>
-            <dt><?js= self.linkto(c.longname, c.name) ?></dt>
-            <dd><?js if (c.summary) { ?><?js= c.summary ?><?js } ?></dd>
-        <?js }); ?></dl>
+        <?js classes.forEach(function(c) { ?>
+            <h3 id="<?js= c.longname ?>" class="name">
+                <span class="ancestors"><?js=
+                    doc.longname.replace(/^module:/, '')
+                ?>.</span><?js=
+                    self.linkto(c.longname, c.name)
+                ?>
+            </h3>
+            <?js if (c.summary ?? c.description) { ?><?js= c.summary ?? c.description ?><?js } ?>
+        <?js }); ?>
     <?js } ?>
 
     <?js

@@ -2,6 +2,9 @@
     <button class="icon-button" id="mobile-menu" data-isopen="false" aria-label="menu">
         <svg><use xlink:href="#menu-icon"></use></svg>
     </button>
+    <button class="icon-button" id="mobile-toc" data-isopen="false" aria-label="toc">
+        <svg><use xlink:href="#toc-icon"></use></svg>
+    </button>
 </div>
 
 <div id="mobile-sidebar" class="mobile-sidebar-container">
@@ -17,5 +20,11 @@
             <?js= this.partial('navbar-actions.tmpl') ?>
         </div>
     </div>
+</div>
 
+<div id="mobile-tocbar" class="mobile-sidebar-container">
+    <div class="mobile-sidebar-wrapper">
+        <span class="sidebar-title">Table of Contents</span>
+        <div class="toc-contents"></div>
+    </div>
 </div>

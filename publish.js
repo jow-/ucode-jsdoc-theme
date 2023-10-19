@@ -36,9 +36,19 @@ const {
 } = require('./clean-jsdoc-theme-defaults');
 
 const htmlsafe = helper.htmlsafe;
-const linkto = helper.linkto;
 const resolveAuthorLinks = helper.resolveAuthorLinks;
 const hasOwnProp = Object.prototype.hasOwnProperty;
+
+const linkto = (longname, linkText, cssClass, fragmentId, memberof) => {
+    linkText ??= longname;
+
+    if (memberof && linkText.indexOf(`${memberof}.`) === 0)
+        linkText = linkText.substring(memberof.length + 1);
+    else if (memberof && linkText == memberof)
+        linkText = linkText.replace(/^.+\./, '');
+
+    return helper.linkto(longname, linkText, cssClass, fragmentId);
+};
 
 const themeOpts = (env && env.opts && env.opts.theme_opts) || {};
 
@@ -165,12 +175,59 @@ function addParamAttributes(params) {
         .map(updateItemName);
 }
 
-function buildItemTypeStrings(item) {
+function fixupTypeName(name, memberof) {
+    name = name.trim();
+
+    let res = [];
+
+    for (let i = 0, s = 0, depth = 0; i <= name.length; i++) {
+        if (depth == 0 && (name[i] == '|' || name[i] == null)) {
+            let type = name.substring(s, i).trim();
+            let m;
+
+            if ((m = type.match(/^Object\.&lt;([^,]+),\s*(.+)>$/)) != null)
+                res.push(`Object&lt;${m[1]}:\u202f${fixupTypeName(m[2], memberof)}>`);
+            else if ((m = type.match(/^Array\.&lt;(.+)>$/)) != null)
+                res.push(`${fixupTypeName(m[1], memberof)}[]`);
+            else if ((m = type.match(/^\((.+)\)$/)) != null)
+                res.push(`(${fixupTypeName(m[1], memberof)})`);
+            else if (memberof)
+                res.push(type.replace(/(<a [^>]+>)([^<>]+)(<\/a>)/g,
+                    (m, s, t, e) => {
+                        if (t.indexOf(`${memberof}.`) === 0)
+                            t = t.substring(memberof.length + 1);
+                        else if (t == memberof)
+                            t = t.replace(/^.+\./, '');
+
+                        return s + t + e;
+                    }
+                ));
+            else
+                res.push(type);
+
+            s = i + 1;
+        }
+        else if (name[i] == '&' && name.substring(i, i + 4) == '&lt;') {
+            depth++;
+            i += 3;
+        }
+        else if (name[i] == '<' || name[i] == '(') {
+            depth++;
+        }
+        else if (depth > 0 && (name[i] == '>' || name[i] == ')')) {
+            depth--;
+        }
+    }
+
+    return res.join('|');
+}
+
+function buildItemTypeStrings(item, memberof) {
     const types = [];
 
     if (item && item.type && item.type.names) {
         item.type.names.forEach(function (name) {
-            types.push(linkto(name, htmlsafe(name)));
+            types.push(fixupTypeName(linkto(name, htmlsafe(name)), memberof));
         });
     }
 
@@ -181,17 +238,17 @@ function buildAttribsString(attribs) {
     let attribsString = '';
 
     if (attribs && attribs.length) {
-        attribsString = htmlsafe(`(${attribs.join(', ')}) `);
+        attribsString = `<span class="signature-attributes">${htmlsafe(attribs.join(', '))}</span>`;
     }
 
     return attribsString;
 }
 
-function addNonParamAttributes(items) {
+function addNonParamAttributes(items, memberof) {
     let types = [];
 
     items.forEach(function (item) {
-        types = types.concat(buildItemTypeStrings(item));
+        types = types.concat(buildItemTypeStrings(item, memberof));
     });
 
     return types;
@@ -226,12 +283,14 @@ function addSignatureReturns(f) {
     }
 
     if (source) {
-        returnTypes = addNonParamAttributes(source);
+        addNonParamAttributes(source, f.memberof).forEach((returnType) => {
+            if (!returnTypes.includes(returnType)) {
+                returnTypes.push(returnType);
+            }
+        });
     }
     if (returnTypes.length) {
-        returnTypesString = ` &rarr; ${attribsString}{${returnTypes.join(
-            '|'
-        )}}`;
+        returnTypesString = ` &rarr; {${returnTypes.join('|')}}${attribsString}`;
     }
 
     let signatureOutput = '';
@@ -851,7 +910,7 @@ exports.publish = async function (taffyData, opts, tutorials) {
     data().each((doclet) => {
         doclet.ancestors = getAncestorLinks(doclet);
 
-        if (doclet.kind === 'member') {
+        if (doclet.kind === 'member' || doclet.kind === 'typedef') {
             addSignatureTypes(doclet);
             addAttribs(doclet);
         }
@@ -874,6 +933,7 @@ exports.publish = async function (taffyData, opts, tutorials) {
     // add template helpers
     view.find = find;
     view.linkto = linkto;
+    view.fixupTypeName = fixupTypeName;
     view.resolveAuthorLinks = resolveAuthorLinks;
     view.tutoriallink = tutoriallink;
     view.htmlsafe = htmlsafe;
@@ -959,6 +1019,9 @@ exports.publish = async function (taffyData, opts, tutorials) {
         const myMixins = helper.find(mixins, { longname: longname });
         const myModules = helper.find(modules, { longname: longname });
         const myNamespaces = helper.find(namespaces, { longname: longname });
+
+        view.fixupTypeName = (type) => fixupTypeName(type, longname);
+        view.linkto = (target, linkText, cssClass, fragmentId) => linkto(target, linkText, cssClass, fragmentId, longname);
 
         if (myModules.length) {
             await generate(
