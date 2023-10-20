@@ -187,6 +187,8 @@ function fixupTypeName(name, memberof) {
 
             if ((m = type.match(/^Object\.&lt;([^,]+),\s*(.+)>$/)) != null)
                 res.push(`Object&lt;${m[1]}:\u202f${fixupTypeName(m[2], memberof)}>`);
+            else if ((m = type.match(/^Promise\.&lt;(.+)>$/)) != null)
+                res.push(`Promise&lt;${fixupTypeName(m[1], memberof)}>`);
             else if ((m = type.match(/^Array\.&lt;(.+)>$/)) != null)
                 res.push(`${fixupTypeName(m[1], memberof)}[]`);
             else if ((m = type.match(/^\((.+)\)$/)) != null)
