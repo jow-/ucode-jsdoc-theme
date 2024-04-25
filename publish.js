@@ -303,18 +303,18 @@ function addSignatureReturns(f) {
     }
     if (returnTypesString) {
         signatureOutput +=
-            '<span class="type-signature">' + returnTypesString + '</span>';
+            ' <span class="type-signature">' + returnTypesString + '</span>';
     }
 
     f.signature = signatureOutput;
 }
 
-function addSignatureTypes(f) {
-    const types = f.type ? buildItemTypeStrings(f) : [];
+function addSignatureTypes(f, memberof) {
+    const types = f.type ? buildItemTypeStrings(f, memberof) : [];
 
     f.signature =
         `${f.signature || ''}<span class="type-signature">` +
-        `${types.length ? ` :${types.join('|')}` : ''}</span>`;
+        `${types.length ? `:&#8201;${types.join('|')}` : ''}</span>`;
 }
 
 function addAttribs(f) {
@@ -913,7 +913,7 @@ exports.publish = async function (taffyData, opts, tutorials) {
         doclet.ancestors = getAncestorLinks(doclet);
 
         if (doclet.kind === 'member' || doclet.kind === 'typedef') {
-            addSignatureTypes(doclet);
+            addSignatureTypes(doclet, doclet.memberof);
             addAttribs(doclet);
         }
 

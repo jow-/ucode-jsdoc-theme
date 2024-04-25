@@ -66,14 +66,6 @@
 
         <th class="type">Type</th>
 
-        <?js if (params.hasAttributes) {?>
-        <th class="attributes">Attributes</th>
-        <?js } ?>
-
-        <?js if (params.hasDefault) {?>
-        <th class="default">Default</th>
-        <?js } ?>
-
         <th class="description last">Description</th>
     </tr>
     </thead>
@@ -95,24 +87,6 @@
                 <?js= self.partial('type.tmpl', param.type.names) ?>
             <?js } ?>
             </td>
-
-            <?js if (params.hasAttributes) {?>
-                <td class="attributes"><?js=
-                    [
-                        ...(param.optional ? ['optional'] : []),
-                        ...(param.nullable ? ['nullable'] : []),
-                        ...(param.variable ? ['repeatable'] : [])
-                    ].join(', ')
-                ?></td>
-            <?js } ?>
-
-            <?js if (params.hasDefault) {?>
-                <td class="default">
-                <?js if (typeof param.defaultvalue !== 'undefined') { ?>
-                    <?js= self.htmlsafe(param.defaultvalue) ?>
-                <?js } ?>
-                </td>
-            <?js } ?>
 
             <td class="description last"><?js=
                 [
